@@ -1,6 +1,7 @@
 const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
+const { ObjectID } = require('bson');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,6 +32,14 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
 
+        })
+
+        // data for delete 
+        app.delete('/user/:id', async(req,res)=>{
+            const id=req.params.id;
+            const query ={_id:ObjectID(id)};
+            const result = await dataCollection.deleteOne(query);
+            res.send(result);
         })
     } finally {
 
