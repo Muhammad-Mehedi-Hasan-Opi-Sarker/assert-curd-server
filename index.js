@@ -41,6 +41,14 @@ async function run() {
             const result = await dataCollection.deleteOne(query);
             res.send(result);
         })
+
+        // data for update 
+        app.get('/user/:id', async(req,res)=>{
+            const id=req.params.id;
+            const query ={_id:ObjectID(id)};
+            const result = await dataCollection.findOne(query);
+            res.send(result);
+        })
     } finally {
 
     }
