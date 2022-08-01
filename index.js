@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, AuthMechanism } = require('mongodb');
 const cors = require('cors');
 const { ObjectID } = require('bson');
 const app = express();
@@ -17,7 +17,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         const dataCollection = client.db('data').collection('user');
-        
+
         // data for set mongodb 
         app.post('/user', async (req, res) => {
             const list = req.body;
@@ -26,26 +26,42 @@ async function run() {
         })
 
         // data for show 
-        app.get('/user', async(req,res)=>{
-            const query={};
-            const cursor=dataCollection.find(query);
+        app.get('/user', async (req, res) => {
+            const query = {};
+            const cursor = dataCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
 
         })
 
         // data for delete 
-        app.delete('/user/:id', async(req,res)=>{
-            const id=req.params.id;
-            const query ={_id:ObjectID(id)};
+        app.delete('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectID(id) };
             const result = await dataCollection.deleteOne(query);
             res.send(result);
         })
 
-        // data for update 
-        app.get('/user/:id', async(req,res)=>{
-            const id=req.params.id;
-            const query ={_id:ObjectID(id)};
+        // update data 
+        app.put('/user/:id', async (req, res) => {
+            const update = req.body;
+            const id = req.params.id;
+            const filter = { _id: ObjectID(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    name: update.name,
+                    email: update.email
+                }
+            }
+            const result = await dataCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        })
+
+        // data get one each for code 
+        app.get('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectID(id) };
             const result = await dataCollection.findOne(query);
             res.send(result);
         })
@@ -54,8 +70,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
 
 app.get('/', (req, res) => {
     res.send('curd operation is running')
