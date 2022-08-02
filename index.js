@@ -1,6 +1,7 @@
 const express = require('express')
 const { MongoClient, ServerApiVersion, AuthMechanism } = require('mongodb');
 const cors = require('cors');
+// for dot env 
 require('dotenv').config()
 const { ObjectID } = require('bson');
 const app = express();
